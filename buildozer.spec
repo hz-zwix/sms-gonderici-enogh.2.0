@@ -1,0 +1,1 @@
+requirements = kivy, requests
