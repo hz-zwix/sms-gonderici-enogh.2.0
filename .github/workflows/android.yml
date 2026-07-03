@@ -1,0 +1,38 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # İstediğin zaman manuel olarak da başlatabilmen için
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Depoyu Klonla
+        uses: actions/checkout@v4
+
+      - name: Python Kurulumu
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Sistem Bağımlılıklarını ve Buildozer'ı Kur
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libsqlite3-dev libreadline-dev libffi-dev libmpdec-dev
+          pip install --upgrade pip
+          pip install buildozer cython virtualenv
+
+      - name: Buildozer ile APK Derle
+        run: |
+          buildozer android debug
+        env:
+          BUILDOZER_WARN_ON_ROOT: 0
+
+      - name: Oluşan APK Dosyasını Yükle (İndirme Linki)
+        uses: actions/upload-artifact@v4
+        with:
+          name: EnoughReborn-Mobile-APK
+          path: bin/*.apk
